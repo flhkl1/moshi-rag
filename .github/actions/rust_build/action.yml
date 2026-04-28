@@ -1,0 +1,38 @@
+name: rust_build
+description: 'Setup rust env'
+inputs:
+  os:
+    default: ubuntu-latest
+  toolchain:
+    default: stable
+  target:
+    default: check
+runs:
+  using: "composite"
+  steps:
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        toolchain: ${{ inputs.toolchain }}
+        override: true
+        components: clippy, rustfmt
+    - name: cargo cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          rust/target/
+        key: ${{ inputs.os }}-cargo-${{ inputs.target }}-${{ hashFiles('**/Cargo.toml') }}
+        restore-keys: ${{ inputs.os }}-cargo-
+    - name: install deps
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libasound2-dev cmake
+        echo "CMAKE=/usr/bin/cmake" >> "${GITHUB_ENV}"
+        echo "CMAKE_POLICY_VERSION_MINIMUM=3.5" >> "${GITHUB_ENV}"
+        echo "test"
+        /usr/bin/cmake --version
+        apt-cache policy cmake

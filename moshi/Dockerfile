@@ -1,0 +1,25 @@
+FROM nvidia/cuda:12.8.1-devel-ubuntu22.04 AS base
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ghcr.io/astral-sh/uv:0.9.21 /uv /uvx /bin/
+WORKDIR /app
+
+ENV UV_COMPILE_BYTECODE=1 UV_LOCKED=1 PYTHONUNBUFFERED=1
+
+COPY . .
+
+ENV HOSTNAME="0.0.0.0"
+
+HEALTHCHECK --start-period=300s --interval=30s \
+    CMD curl --fail http://localhost:80/api/health || exit 1
+
+CMD [ \
+        "uv", "run", "--no-dev", "-m", "moshi.server", \
+        "--config", "hf://kyutai/moshika-rag-pytorch-bf16/config.json", \
+        "--moshi-weight", "hf://kyutai/moshika-rag-pytorch-bf16/model.safetensors", \
+        "--device", "cuda:0", \
+        "--init-active-speaker", "model", \
+        "--host", "0.0.0.0", \
+        "--port", "80" \
+    ]

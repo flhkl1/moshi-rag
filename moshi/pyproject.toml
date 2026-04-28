@@ -1,0 +1,61 @@
+[project]
+name = "moshi"
+requires-python = ">= 3.10,<3.15"
+description = "MoshiRAG"
+dependencies = [
+    "numpy >= 1.26, < 2.3",
+    "safetensors >= 0.4.0, < 0.8.0",
+    "huggingface-hub >= 0.24, < 1.0.0",
+    "bitsandbytes >= 0.45, < 0.50.0; sys_platform == 'linux'",
+    "einops >= 0.7, < 0.9",
+    "sentencepiece >= 0.2.0, < 0.3",
+    "sounddevice == 0.5",
+    "sphn >= 0.2.0, < 0.3.0",
+    "torch >= 2.2.0, < 2.10",
+    "aiohttp>=3.10.5, <3.12",
+    "tqdm >= 4.48",
+    "openai>=2.26.0",
+    "transformers==4.55.3",
+    "xformers>=0.0.33.post2",
+    "gradio>=5.50.0",
+    "msgpack>=1.1.2",
+    "gradium",
+]
+authors = [
+    {name="Chung-Ming Chien", email="cmchien@kyutai.org"},
+    {name="Chung-Ming Chien", email="cmchien@ttic.edu"},
+]
+maintainers = [
+    {name="Chung-Ming Chien", email="cmchien@kyutai.org"},
+    {name="Chung-Ming Chien", email="cmchien@ttic.edu"},
+]
+license = {text = "MIT"}
+readme = "../README.md"
+version = "0.2.13"
+
+[project.scripts]
+moshi-server-py = "moshi.server:main"
+moshi-server-rag = "moshi.server_rag:main"
+moshi-client-py = "moshi.client:main"
+moshi-inference = "moshi.run_inference:main"
+moshi-wav-batch = "moshi.run_inference_wav_batch:main"
+moshi-tts = "moshi.run_tts:main"
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.optional-dependencies]
+dev = [
+    "pyright",
+    "pytest",
+    "flake8",
+    "pre-commit",
+    "gradio-webrtc>=0.0.18"
+]
+
+# Ruff is not enforced atm, but if you want to use it on your code
+# (e.g. via "Format modified lines" in VSCode), you'll get these settings
+[tool.ruff]
+line-length = 120

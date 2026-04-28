@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-canvas: #FCF7F2;
+  --color-thumb-border: #f6f7ed;
+  --color-link-accent: #54e8b3;
+  --color-link-soft: #BCFCE5;
+}
+
+@layer base {
+
+  html {
+    font-size: 112.5%;
+    /* 18px equivalent – makes all rem-based fonts ~12.5% larger */
+  }
+
+  body {
+    background-color: var(--color-bg-canvas);
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+}
+
+@layer utilities {
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .scrollbar::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: white;
+    border: 3px solid var(--color-thumb-border);
+  }
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: min-content 1fr 1fr 1fr;
+  gap: 30px;
+  grid-auto-flow: column;
+  grid-template-areas:
+    "controls"
+    "player"
+    "player-text"
+    "reference-panel";
+
+  @media screen and (min-width: 768px) {
+    grid-template-columns: 2fr 2.5fr;
+    grid-template-rows: min-content min-content 1.5fr 1fr;
+    gap: 30px 30px;
+    grid-auto-flow: column;
+    align-items: center;
+    justify-items: center;
+    grid-template-areas:
+      "controls controls"
+      "player player-stats"
+      "player player-text"
+      "reference-panel player-text";
+  }
+}
+
+.presentation {
+  max-width: 450px;
+}
+
+.presentation>p {
+  padding-top: 10px;
+}
+
+
+.gallery {
+  max-width: 450px;
+}
+
+.cute-words {
+  color: var(--color-link-accent);
+}
+
+
+.download-links {
+  color: var(--color-link-accent);
+}
+
+.explain-links {
+  color: var(--color-link-soft);
+}
+
+
+.controls {
+  grid-area: controls;
+}
+
+.player {
+  grid-area: player;
+  grid-template-areas:
+    "server-audio"
+    "user-audio";
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  /* margin:auto; */
+}
+
+.reference-panel {
+  grid-area: reference-panel;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
+
+.server-audio {
+  grid-area: server-audio;
+}
+
+.user-audio {
+  grid-area: user-audio;
+}
+
+.player-stats {
+  grid-area: player-stats;
+  width: 100%;
+  height: 100%;
+}
+
+.commands {
+  grid-area: commands;
+  width: 100%;
+  height: 100%;
+}
+
+.player-text {
+  grid-area: player-text;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
+
+/* Pipe flow: dashes move along path (green = into retrieval box, blue = out of it) */
+@keyframes pipeFlow {
+  from {
+    stroke-dashoffset: 8;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.pipe-flow-in,
+.pipe-flow-out {
+  animation: pipeFlow 0.8s linear infinite;
+}
