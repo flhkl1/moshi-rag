@@ -9,6 +9,11 @@ fi
 
 cd /workspace/moshi-rag
 
+# HuggingFace login (token set as RunPod env var HUGGING_FACE_HUB_TOKEN)
+if [ -n "$HUGGING_FACE_HUB_TOKEN" ]; then
+    huggingface-cli login --token "$HUGGING_FACE_HUB_TOKEN"
+fi
+
 # Install Python package
 pip install -e /workspace/moshi-rag/moshi
 
