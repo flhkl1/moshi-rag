@@ -12,8 +12,9 @@ cd /workspace/moshi-rag
 # Install Python package
 pip install -e /workspace/moshi-rag/moshi
 
-# Pin torch ecosystem to compatible versions
-pip install torch==2.9.1 torchvision xformers==0.0.33.post2 --force-reinstall
+# Pin torch ecosystem to compatible versions (already handled by pyproject.toml, skip if correct versions present)
+python3 -c "import torch; assert torch.__version__ == '2.9.1'" 2>/dev/null || \
+    pip install torch==2.9.1 torchvision xformers==0.0.33.post2 --force-reinstall
 
 # Fix editable install .pth file (hatchling bug — path is wrong by default)
 echo "/workspace/moshi-rag" > /usr/local/lib/python3.11/dist-packages/_editable_impl_moshi.pth
@@ -39,3 +40,6 @@ echo ""
 echo "Terminal 2 — Main server:"
 echo "  cd /workspace/moshi-rag && python3 -m moshi.moshi.server \\"
 echo "    --gradio-tunnel --static ./client/dist --init-active-speaker model --gradium-stt"
+
+# Keep container alive so RunPod doesn't restart and re-run this script
+sleep infinity
