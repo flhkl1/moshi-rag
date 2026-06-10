@@ -13,7 +13,7 @@ cd /workspace/moshi-rag
 pip install -e /workspace/moshi-rag/moshi
 
 # Pin torch ecosystem to compatible versions (already handled by pyproject.toml, skip if correct versions present)
-python3 -c "import torch; assert torch.__version__ == '2.9.1'" 2>/dev/null || \
+python3 -c "import torch; assert torch.__version__.startswith('2.9.1')" 2>/dev/null || \
     pip install torch==2.9.1 torchvision xformers==0.0.33.post2 --force-reinstall
 
 # Fix editable install .pth file (hatchling bug — path is wrong by default)
@@ -29,17 +29,23 @@ apt-get install -y nodejs
 cd /workspace/moshi-rag/client
 npm install && npm run build
 
-echo "Setup complete. Run the following in separate terminals:"
-echo ""
-echo "Terminal 1 — Reference encoder:"
-echo "  python3 -m moshi.moshi.server_conditioner \\"
-echo "    --config hf://kyutai/moshika-rag-pytorch-bf16/config.json \\"
-echo "    --moshi-weight hf://kyutai/moshika-rag-pytorch-bf16/model.safetensors \\"
-echo "    --cuda-device 0 --conditioner reference_with_time --port 8001"
-echo ""
-echo "Terminal 2 — Main server:"
-echo "  cd /workspace/moshi-rag && python3 -m moshi.moshi.server \\"
-echo "    --gradio-tunnel --static ./client/dist --init-active-speaker model --gradium-stt"
+echo "Setup complete. Starting servers..."
 
-# Keep container alive so RunPod doesn't restart and re-run this script
-sleep infinity
+# Kill anything on port 8001 (nginx occupies it by default)
+fuser -k 8001/tcp 2>/dev/null || true
+
+# Start reference encoder in background
+python3 -m moshi.moshi.server_conditioner \
+    --config hf://kyutai/moshika-rag-pytorch-bf16/config.json \
+    --moshi-weight hf://kyutai/moshika-rag-pytorch-bf16/model.safetensors \
+    --cuda-device 0 --conditioner reference_with_time --port 8001 &
+
+# Wait for port 8001 to be ready
+echo "Waiting for reference encoder on port 8001..."
+until ss -tlnp | grep -q ':8001'; do sleep 3; done
+echo "Reference encoder ready. Starting main server..."
+
+# Start main server in foreground (keeps container alive, prints gradio tunnel URL)
+cd /workspace/moshi-rag
+python3 -m moshi.moshi.server \
+    --gradio-tunnel --static ./client/dist --init-active-speaker model --gradium-stt
