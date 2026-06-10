@@ -54,7 +54,7 @@ apt-get install -y nodejs
 log "System dependencies done."
 
 # Build frontend
-if [ ! -f $DONE/npm ]; then
+if [ ! -f $DONE/npm ] || [ ! -d /workspace/moshi-rag/client/dist ]; then
     log "Building frontend..."
     cd /workspace/moshi-rag/client
     npm install && npm run build
