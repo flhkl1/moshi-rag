@@ -49,20 +49,29 @@ class LLMClient:
         """Test that the server can answer correctly and the API key is valid."""
         self.generate(prompt=prompt or self.prompt, context="", max_new_tokens=5)
 
+    @property
+    def _is_o_series(self) -> bool:
+        import re
+        return bool(re.match(r'^o\d', self.model_name))
+
     def generate(
         self, prompt: str, context: str, max_new_tokens: int = 512, stop_token: str | None = "\n", **kwargs
     ) -> str:
         messages = self._build_messages(prompt or self.prompt, context)
         t_start_response_generation = time.monotonic()
-        response = self.client.chat.completions.create(
+        params: dict = dict(
             model=self.model_name,
             messages=messages,
-            max_tokens=max_new_tokens,
-            temperature=self.temperature,
-            reasoning_effort="low",
-            stop=[stop_token] if stop_token is not None else None,
             **kwargs,
         )
+        if self._is_o_series:
+            params["max_completion_tokens"] = max_new_tokens
+        else:
+            params["max_tokens"] = max_new_tokens
+            params["temperature"] = self.temperature
+            if stop_token is not None:
+                params["stop"] = [stop_token]
+        response = self.client.chat.completions.create(**params)
 
         logger.info(f"LLM response: {response}")
         text_response = response.choices[0].message.content

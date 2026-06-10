@@ -104,7 +104,7 @@ Set the environment variables appropriately before starting the main server (rep
 **1. Start the reference text encoder** (config and checkpoints can be downloaded from [Hugging Face](https://huggingface.co/kyutai/moshika-rag-pytorch-bf16) ):
 
 ```bash
-python -m moshi.moshi.server_conditioner \
+python3 -m moshi.moshi.server_conditioner \
     --config hf://kyutai/moshika-rag-pytorch-bf16/config.json \
     --moshi-weight hf://kyutai/moshika-rag-pytorch-bf16/model.safetensors \
     --cuda-device 0 \
