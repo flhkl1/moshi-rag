@@ -56,8 +56,14 @@ log "System dependencies done."
 # Build frontend
 if [ ! -f $DONE/npm ] || [ ! -d /workspace/moshi-rag/client/dist ]; then
     log "Building frontend..."
-    cd /workspace/moshi-rag/client
+    # Build on local container disk to avoid EIO errors writing node_modules to NFS /workspace
+    BUILD_DIR=/tmp/client-build
+    rm -rf $BUILD_DIR
+    cp -r /workspace/moshi-rag/client $BUILD_DIR
+    cd $BUILD_DIR
     npm install && npm run build
+    cp -r $BUILD_DIR/dist /workspace/moshi-rag/client/dist
+    rm -rf $BUILD_DIR
     touch $DONE/npm
     log "Frontend built."
 else

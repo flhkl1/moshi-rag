@@ -279,6 +279,10 @@ class Channel:
                 except (UnicodeDecodeError, json.JSONDecodeError):
                     self._log.warning("invalid metadata json from client")
                     continue
+                sp = payload.get("system_prompt")
+                if sp is not None:
+                    self.rag_manager.reference_generator.set_system_prompt(sp)
+                    self._log.info("system prompt updated (%d chars)", len(sp))
                 rid = payload.get("retrieval_backend_id")
                 if rid is None:
                     continue

@@ -103,6 +103,11 @@ class LLMReferenceGenerator:
         else:
             self.llm.warmup()
 
+    def set_system_prompt(self, prompt: str) -> None:
+        self.llm.system_prompt = prompt
+        for llm in self._llm_by_id.values():
+            llm.system_prompt = prompt
+
     def reference_model_display_name(self, active_profile_id: str | None = None) -> str:
         """Model name for the given (or default) retrieval profile."""
         if active_profile_id and active_profile_id in self._llm_by_id:
